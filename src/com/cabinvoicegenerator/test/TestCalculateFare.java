@@ -33,8 +33,7 @@ public class TestCalculateFare {
 			{0.21f, 0.2f, 5},
 			{0.5f, 0.2f, 5.2f},
 			{0.1f, 3.4f, 5},
-			{0.1f, 5, 5.1f},
-			{0.1f, 5, 5.1f},
+			{0.1f, 5, 6f},
 			{0, 10, 10},
 			{10, 0, 100},
 			{1, 1, 11},
@@ -43,7 +42,7 @@ public class TestCalculateFare {
 	
 	@Test
 	public void test() {
-		Assert.assertEquals(expectedFare, cabInvoiceGenerator.calculateFare(distanceInKiloMeters, timeInMinutes));
+		Assert.assertEquals(expectedFare, cabInvoiceGenerator.calculateFare(distanceInKiloMeters, timeInMinutes), 0.001);
 	}
 
 }
