@@ -1,0 +1,3 @@
+module CabInvoiceGenerator {
+	requires junit;
+}
