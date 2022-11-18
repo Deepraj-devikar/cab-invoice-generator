@@ -4,6 +4,30 @@ import java.text.DecimalFormat;
 import java.util.Hashtable;
 
 public class CabInvoiceGenerator {
+	
+	public class Invoice {
+		private int userId;
+		private float[][] ridesData;
+		private Hashtable<String, Float> totals;
+		
+		private Invoice(int userId, float[][] ridesData, Hashtable<String, Float> totals) {
+			this.userId = userId;
+			this.ridesData = ridesData;
+			this.totals = totals;
+		}
+
+		public int getUserId() {
+			return userId;
+		}
+
+		public float[][] getRidesData() {
+			return ridesData;
+		}
+
+		public Hashtable<String, Float> getTotals() {
+			return totals;
+		}	
+	}
 
 	public float calculateFare(float distanceInKiloMeters, float timeInMinutes) {
 		float fare = distanceInKiloMeters * 10 + timeInMinutes;
@@ -34,6 +58,10 @@ public class CabInvoiceGenerator {
 						)
 				);
 		return enhancedInvoice;
+	}
+
+	public Invoice invoiceService(int userId, float[][] dataToCalculateFare) {
+		return new Invoice(userId, dataToCalculateFare, invoice(dataToCalculateFare));
 	}
 
 }
