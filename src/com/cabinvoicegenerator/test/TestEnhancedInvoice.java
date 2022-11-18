@@ -2,6 +2,7 @@ package com.cabinvoicegenerator.test;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Hashtable;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,10 +13,10 @@ import org.junit.runners.Parameterized;
 import com.cabinvoicegenerator.CabInvoiceGenerator;
 
 @RunWith(Parameterized.class)
-public class TestMultipleRides {
+public class TestEnhancedInvoice {
 	private float[] distancesInKiloMeters;
 	private float[] timesInMinutes;
-	private float expectedFare;
+	private Hashtable<String, Float> expectedInvoice;
 	private CabInvoiceGenerator cabInvoiceGenerator;
 	
 	@Before
@@ -23,12 +24,12 @@ public class TestMultipleRides {
 		cabInvoiceGenerator = new CabInvoiceGenerator();
 	}
 	
-	public TestMultipleRides(float[] distancesInKiloMeters, float[] timesInMinutes, float expectedFare) {
+	public TestEnhancedInvoice(float[] distancesInKiloMeters, float[] timesInMinutes, Hashtable<String, Float> expectedInvoice) {
 		this.distancesInKiloMeters = distancesInKiloMeters;
 		this.timesInMinutes = timesInMinutes;
-		this.expectedFare = expectedFare;
+		this.expectedInvoice = expectedInvoice;
 	}
-	
+
 	@Parameterized.Parameters
 	public static Collection testInputs() {
 		
@@ -36,6 +37,7 @@ public class TestMultipleRides {
 		
 		float[] distancesInKiloMeters;
 		float[] timesInMinutes;
+		Hashtable<String, Float> expectedInvoice;
 		
 		distancesInKiloMeters = new float[8];
 		timesInMinutes = new float[8];
@@ -57,7 +59,11 @@ public class TestMultipleRides {
 		timesInMinutes[7] = 1f;
 		inputs[0][0] = distancesInKiloMeters;
 		inputs[0][1] = timesInMinutes;
-		inputs[0][2] = 297.2f;
+		expectedInvoice = new Hashtable<String, Float>();
+		expectedInvoice.put("Total Number Of Rides", 8f);
+		expectedInvoice.put("Total Fare", 297.2f);
+		expectedInvoice.put("Average Fare Per Ride", 37.15f);
+		inputs[0][2] = expectedInvoice;
 		
 		distancesInKiloMeters = new float[8];
 		timesInMinutes = new float[8];
@@ -79,11 +85,15 @@ public class TestMultipleRides {
 		timesInMinutes[7] = 1f;
 		inputs[1][0] = distancesInKiloMeters;
 		inputs[1][1] = timesInMinutes;
-		inputs[1][2] = 226.2f;
+		expectedInvoice = new Hashtable<String, Float>();
+		expectedInvoice.put("Total Number Of Rides", 8f);
+		expectedInvoice.put("Total Fare", 226.2f);
+		expectedInvoice.put("Average Fare Per Ride", 28.27f);
+		inputs[1][2] = expectedInvoice;
 		
 		return Arrays.asList(inputs);
 	}
-
+	
 	@Test
 	public void test() {
 		float[][] dataToCalculateFare = new float[distancesInKiloMeters.length][2];
@@ -91,7 +101,7 @@ public class TestMultipleRides {
 			dataToCalculateFare[i][0] = distancesInKiloMeters[i];
 			dataToCalculateFare[i][1] = timesInMinutes[i];
 		}
-		Assert.assertEquals(expectedFare, cabInvoiceGenerator.multipleRides(dataToCalculateFare), 0.001f);
+		Assert.assertEquals(expectedInvoice, cabInvoiceGenerator.invoice(dataToCalculateFare));
 	}
 
 }
