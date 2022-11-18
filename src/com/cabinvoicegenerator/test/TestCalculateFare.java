@@ -27,7 +27,7 @@ public class TestCalculateFare {
 	}
 	
 	@Parameterized.Parameters
-	public static Collection testEmails() {
+	public static Collection inputs() {
 		return Arrays.asList(new Object[][] {
 			{15, 54, 204},
 			{0.21f, 0.2f, 5},
