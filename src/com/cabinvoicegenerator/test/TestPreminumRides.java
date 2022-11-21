@@ -1,5 +1,7 @@
 package com.cabinvoicegenerator.test;
 
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -11,13 +13,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import com.cabinvoicegenerator.CabInvoiceGenerator;
-import com.cabinvoicegenerator.CabInvoiceGenerator.Invoice;;
+import com.cabinvoicegenerator.CabInvoiceGenerator.Invoice;
 
 @RunWith(Parameterized.class)
-public class TestInvoiceService {
+public class TestPreminumRides {
 	private int userId;
 	private float[] distancesInKiloMeters;
 	private float[] timesInMinutes;
+	private float[] rideTypes;
 	private CabInvoiceGenerator cabInvoiceGenerator;
 	
 	@Before
@@ -25,23 +28,26 @@ public class TestInvoiceService {
 		cabInvoiceGenerator = new CabInvoiceGenerator();
 	}
 	
-	public TestInvoiceService(int userId, float[] distancesInKiloMeters, float[] timesInMinutes) {
+	public TestPreminumRides(int userId, float[] distancesInKiloMeters, float[] timesInMinutes, float[] rideTypes) {
 		this.userId = userId;
 		this.distancesInKiloMeters = distancesInKiloMeters;
 		this.timesInMinutes = timesInMinutes;
+		this.rideTypes = rideTypes;
 	}
-
+	
 	@Parameterized.Parameters
 	public static Collection testInputs() {
 		
-		Object[][] inputs = new Object[2][3];
+		Object[][] inputs = new Object[2][4];
 		
 		float[] distancesInKiloMeters;
 		float[] timesInMinutes;
+		float[] rideTypes;
 		Hashtable<String, Float> expectedInvoice;
 		
 		distancesInKiloMeters = new float[10];
 		timesInMinutes = new float[10];
+		rideTypes = new float[10];
 		distancesInKiloMeters[0] = 15f;
 		distancesInKiloMeters[1] = 0.21f;
 		distancesInKiloMeters[2] = 0.5f;
@@ -62,12 +68,24 @@ public class TestInvoiceService {
 		timesInMinutes[7] = 1f;
 		timesInMinutes[8] = 10f;
 		timesInMinutes[9] = 0f;
-		inputs[0][0] = 1000;
+		rideTypes[0] = 0f;
+		rideTypes[1] = 0f;
+		rideTypes[2] = 0f;
+		rideTypes[3] = 1f;
+		rideTypes[4] = 1f;
+		rideTypes[5] = 1f;
+		rideTypes[6] = 0f;
+		rideTypes[7] = 1f;
+		rideTypes[8] = 1f;
+		rideTypes[9] = 0f;
+		inputs[0][0] = 1;
 		inputs[0][1] = distancesInKiloMeters;
 		inputs[0][2] = timesInMinutes;
+		inputs[0][3] = rideTypes;
 		
 		distancesInKiloMeters = new float[10];
 		timesInMinutes = new float[10];
+		rideTypes = new float[10];
 		distancesInKiloMeters[0] = 1f;
 		distancesInKiloMeters[1] = 0.21f;
 		distancesInKiloMeters[2] = 0.5f;
@@ -88,29 +106,34 @@ public class TestInvoiceService {
 		timesInMinutes[7] = 1f;
 		timesInMinutes[8] = 10f;
 		timesInMinutes[9] = 20f;
-		inputs[1][0] = 1001;
+		rideTypes[0] = 0f;
+		rideTypes[1] = 0f;
+		rideTypes[2] = 0f;
+		rideTypes[3] = 1f;
+		rideTypes[4] = 1f;
+		rideTypes[5] = 1f;
+		rideTypes[6] = 0f;
+		rideTypes[7] = 1f;
+		rideTypes[8] = 1f;
+		rideTypes[9] = 0f;
+		inputs[1][0] = 11;
 		inputs[1][1] = distancesInKiloMeters;
 		inputs[1][2] = timesInMinutes;
+		inputs[1][3] = rideTypes;
 		
 		return Arrays.asList(inputs);
 	}
-	
+
 	@Test
 	public void test() {
-		float[][] dataToCalculateFare = new float[distancesInKiloMeters.length][2];
+		float[][] dataToCalculateFare = new float[distancesInKiloMeters.length][3];
 		for(int i = 0; i < distancesInKiloMeters.length; i++) {
 			dataToCalculateFare[i][0] = distancesInKiloMeters[i];
 			dataToCalculateFare[i][1] = timesInMinutes[i];
-			cabInvoiceGenerator.doRide(userId, distancesInKiloMeters[i], timesInMinutes[i], 0);
+			dataToCalculateFare[i][2] = rideTypes[i];
+			cabInvoiceGenerator.doRide(userId, distancesInKiloMeters[i], timesInMinutes[i], rideTypes[i]);
 		}
 		Invoice invoice = cabInvoiceGenerator.invoiceService(userId);
-		Assert.assertEquals(userId, invoice.getUserId());
-		String[][] ridesData = invoice.getRidesData();
-		for(int i = 0; i < distancesInKiloMeters.length; i++) {
-			for(int j = 0; j < dataToCalculateFare[i].length; j++) {
-				Assert.assertEquals(String.valueOf(dataToCalculateFare[i][j]), ridesData[i][j]);
-			}
-		}
 		Assert.assertEquals(cabInvoiceGenerator.invoice(dataToCalculateFare), invoice.getTotals());
 	}
 

@@ -42,7 +42,7 @@ public class TestCalculateFare {
 	
 	@Test
 	public void test() {
-		Assert.assertEquals(expectedFare, cabInvoiceGenerator.calculateFare(distanceInKiloMeters, timeInMinutes), 0.001);
+		Assert.assertEquals(expectedFare, cabInvoiceGenerator.calculateFare(distanceInKiloMeters, timeInMinutes, 0), 0.001);
 	}
 
 }

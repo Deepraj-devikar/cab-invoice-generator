@@ -4,13 +4,20 @@ import java.text.DecimalFormat;
 import java.util.Hashtable;
 
 public class CabInvoiceGenerator {
+	private Hashtable<Integer, float[][]> rideRepository;
+	private Hashtable<Integer, Integer> rideCountInRepository;
+	
+	public CabInvoiceGenerator() {
+		rideRepository = new Hashtable<Integer, float[][]>();
+		rideCountInRepository = new Hashtable<Integer, Integer>();
+	}
 	
 	public class Invoice {
 		private int userId;
-		private float[][] ridesData;
+		private String[][] ridesData;
 		private Hashtable<String, Float> totals;
 		
-		private Invoice(int userId, float[][] ridesData, Hashtable<String, Float> totals) {
+		private Invoice(int userId, String[][] ridesData, Hashtable<String, Float> totals) {
 			this.userId = userId;
 			this.ridesData = ridesData;
 			this.totals = totals;
@@ -20,7 +27,7 @@ public class CabInvoiceGenerator {
 			return userId;
 		}
 
-		public float[][] getRidesData() {
+		public String[][] getRidesData() {
 			return ridesData;
 		}
 
@@ -29,18 +36,26 @@ public class CabInvoiceGenerator {
 		}	
 	}
 
-	public float calculateFare(float distanceInKiloMeters, float timeInMinutes) {
-		float fare = distanceInKiloMeters * 10 + timeInMinutes;
-		if(fare > 5f) {
-			return fare;
+	public float calculateFare(float distanceInKiloMeters, float timeInMinutes, float rideType) {
+		if(rideType == 0f) {
+			float fare = distanceInKiloMeters * 10 + timeInMinutes;
+			if(fare > 5f) {
+				return fare;
+			}
+			return 5f;	
+		} else {
+			float fare = distanceInKiloMeters * 15 + (timeInMinutes * 2);
+			if(fare > 20f) {
+				return fare;
+			}
+			return 20f;
 		}
-		return 5f;
 	}
 
 	public float multipleRides(float[][] rideData) {
 		float fare = 0f;
 		for(int rideNumber = 0; rideNumber < rideData.length; rideNumber++) {
-			fare += calculateFare(rideData[rideNumber][0], rideData[rideNumber][1]);
+			fare += calculateFare(rideData[rideNumber][0], rideData[rideNumber][1], rideData[rideNumber][2]);
 		}
 		return fare;
 	}
@@ -59,9 +74,35 @@ public class CabInvoiceGenerator {
 				);
 		return enhancedInvoice;
 	}
+	
+	public void doRide(int userId, float distanceInKiloMeters, float timeInMinutes, float rideType) {
+		float[][] rides;
+		if(rideRepository.containsKey(userId)) {
+			rides = rideRepository.get(userId);
+		} else {
+			rides = new float[10][2];
+			rideRepository.put(userId, rides);
+			rideCountInRepository.put(userId, 0);
+		}
+		float[] ride = {distanceInKiloMeters, timeInMinutes, rideType};
+		int ridesCount = rideCountInRepository.get(userId);
+		rides[ridesCount++] = ride;
+		rideCountInRepository.put(userId, ridesCount);
+	}
 
-	public Invoice invoiceService(int userId, float[][] dataToCalculateFare) {
-		return new Invoice(userId, dataToCalculateFare, invoice(dataToCalculateFare));
+	public Invoice invoiceService(int userId) {
+		float[][] rides = rideRepository.get(userId);
+		String[][] ridesData = new String[10][3];
+		for(int i = 0; i < rides.length; i++) {
+			ridesData[i][0] = String.valueOf(rides[i][0]);
+			ridesData[i][1] = String.valueOf(rides[i][1]);
+			if(rides[i][2] == 0f) {
+				ridesData[i][2] = "Normal";
+			} else {
+				ridesData[i][2] = "Premium";
+			}
+		}
+		return new Invoice(userId, ridesData, invoice(rides));
 	}
 
 }
